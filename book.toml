@@ -1,0 +1,14 @@
+[book]
+title = "PITTv3 User's Guide"
+authors = ["Carl Wallace"]
+language = "en"
+src = "src"
+
+[output.html]
+default-theme = "light"
+git-repository-url = "https://github.com/carl-wallace/pittv3-book"
+
+# Declaring a second backend makes mdBook nest its output per backend, so the HTML lands in
+# book/html rather than book, and the PDF in book/pdf/output.pdf. Anything that publishes the
+# built book has to point at book/html for that reason.
+[output.pdf]

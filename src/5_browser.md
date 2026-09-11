@@ -34,7 +34,10 @@ Uploads accumulate across selections until cleared.
 ### Built-in stores
 
 The Web PKI store holds the Mozilla trust anchors plus the CCADB intermediate CAs. The DoD store
-holds the NIPR roots and intermediate CAs.
+holds the NIPR roots and intermediate CAs. The ECA store holds the External Certification Authority
+roots and the vendor CAs beneath them — the program under which commercial vendors issue to people
+and systems outside the Department of Defense that interoperate with it. NIPR and ECA are separate
+trust sets: a certificate from one does not validate under the other.
 
 Where the application is served by a PITTv3 service, the trust stores that service holds appear in
 the same dropdown. A store it holds under a name the application already ships is the same material

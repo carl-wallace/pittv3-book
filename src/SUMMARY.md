@@ -9,3 +9,4 @@
 - [Miscellaneous](7_miscellaneous.md)
 - [Limitations and known issues](8_known_issues.md)
 - [Release notes](9_release_notes.md)
+- [Appendix: settings samples](A_settings_samples.md)

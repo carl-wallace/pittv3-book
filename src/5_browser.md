@@ -45,6 +45,13 @@ and is not listed twice. The line under the dropdown says where the selected sto
 matters for a store a deployment supplied itself: its certificates may have been gathered by
 following AIA URIs rather than published by the PKI they claim to come from.
 
+That line also says how current the material is, in the same words the desktop uses: *published*,
+the date the source itself gives, and *collected*, the day the material was taken from it. The two
+can be far apart — a DoD InstallRoot stream is timestamped when signed, and can be well over a year
+old by the time it is downloaded — which is why the fetch date alone would be misleading. A store
+shows only the dates it can state honestly; one assembled from a service's configured directory
+shows none, since a `.cbor` artifact records certificates and not when they were gathered.
+
 ## Validating
 
 Certificates to validate accumulate as they are selected. Nothing runs until the Validate button is
@@ -66,6 +73,50 @@ every path as a zip.
 Its own view, fetching every HTTP URI one certificate names and reporting each on its own. See
 [Checking the URIs in a certificate](7_miscellaneous.md). With retrieval set to this browser only
 there is nothing to fetch with, so the check needs the service.
+
+## Generate
+
+Builds a store rather than validating against one. Its material is what is loaded in the *Inputs*
+group on the tab — trust anchors and intermediate CA certificates, as DER or PEM certificates, as
+bundles, or as `.cbor` stores, which is how an existing store serves as a starting point. A store
+the application ships is deliberately not offered as one, as it is not on the desktop: what goes
+into a store you are about to hand out should be material you chose.
+
+*Chase SIA and AIA* follows the URIs the loaded certificates name and folds what they serve into the
+pool before the paths are found, within the run's retrieval budget. That is retrieval, so it needs
+the service and is unavailable without one; building from the material already loaded needs nothing,
+which is why the view itself is available on a statically hosted copy.
+
+A partial path runs from a certificate to a trust anchor, so at least one anchor has to be among the
+material — the command line requires one for the same reason. The time of interest decides which
+certificates reach the store.
+
+The certificates that do reach it are the ones the command line keeps when it reads a folder: one
+that will not parse, is outside the time of interest, is self-signed, or does not assert `cA` is
+left out, and the run says how many it imported out of how many candidates. Those exclusions arrive
+as **marks on the report** rather than as a silent drop — the command line applies the same screen
+while reading the folder, where there is nothing left to show — so they can be cleared if a store of
+everything is what you want.
+
+**The run writes nothing.** It describes what it built in the tables below, and *Save as a new
+store* hands the pair over as a single zip holding `ta.cbor` and `ca.cbor`, those being the names
+every other interface reads them back under. One zip rather than two saves because a page cannot
+start two downloads, and because the pair is one artifact.
+
+## Inspect
+
+Describes a store without validating anything, in the same three tables the desktop shows: every
+certificate the store holds, the partial paths grouped by the leaf CA they end at, and the trust
+anchors, joined on index. The store is the selected one, or the `.cbor` pair named with the two file
+controls, or both — a named store's anchors and certificates merge with the selector's.
+
+Supplying a certificate under *Partial Paths for Target* adds the paths the store could build to
+that certificate, which is the question to ask when something would not validate and you want to
+know what the store had to work with.
+
+Marking, *Mark what a cleanup would remove*, *Clear marks* and *Save as a new store* behave as they
+do on the desktop, the save arriving as the same zip Generate's does. The report, the marks and the
+time of interest are shared with Generate: it is one report reached by two errands, not two copies.
 
 ## Hackathon
 

@@ -63,11 +63,14 @@ path building already done.
 There are four methods for obtaining a pair of trust store files. All use the same format and all
 are interchangeable.
 
-**Generated from certificates you hold.** `pittv3 --generate`, or the Generate view in the desktop
-application, reads a folder of trust anchors and CA certificates and generates the CBOR files. This
-is how a custom store for your own PKI can be created. The `--chase-aia-and-sia` option extends a
-collection of files by following the URIs the certificates name, so the network work happens once,
-here, rather than on every validation.
+**Generated from certificates you hold.** `pittv3 --generate` reads a folder of trust anchors and CA
+certificates and generates the CBOR files; the Generate view does the same from material named on
+the form, in the desktop application, and from material uploaded to the page, in the browser. This
+is how a custom store for your own PKI can be created. Chasing — `--dynamic-build` on the command
+line, *Chase SIA and AIA* on the two forms — extends the collection by following the URIs the
+certificates name, so the network work happens once, here, rather than on every validation. In the
+browser that chase is made by a PITTv3 service on the page's behalf, so it is available only where
+one is serving the page.
 
 **Built into the application.** Selectable from the store dropdown on the Validate view without any
 network access. There is a small ecosystem of crates that implement the necessary interfaces to

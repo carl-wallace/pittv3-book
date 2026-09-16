@@ -39,6 +39,12 @@ client holding the anchors that its CA store was current.
 A store offering anchors only answers `ca.cbor` with a 404, which is correct rather than a fault —
 `webpki_tls` and `webpki_email` have no CA part.
 
+The listing at `api/stores` describes each store to a client's selector: its identifier and name,
+the URIs of its two artifacts, whether it came from a trust store provider or the configured
+directory, and — for a provider store — when its material was published and when it was collected.
+A store read from `--stores` reports neither date: a `.cbor` artifact holds certificates and partial
+paths, and nothing about when they were gathered, so the service would be guessing.
+
 ### Turning parts off
 
 A deployment is expected to disable what it does not want, and the defaults are conservative.

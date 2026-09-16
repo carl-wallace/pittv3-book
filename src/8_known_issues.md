@@ -11,7 +11,7 @@ declining to answer.
 **FN-DSA is not verified.** The identifiers are declared; verification waits on a FIPS 206
 implementation.
 
-**This is not a TLS verifier.** Web PKI-specific behaviour — name matching rules, policy
+**This is not a TLS verifier.** Web PKI-specific behavior — name matching rules, policy
 requirements particular to the CA/Browser Forum baseline — is out of scope by design. PITTv3
 validates certification paths per RFC 5280 and RFC 5937; it does not decide whether a certificate is
 acceptable for a TLS connection.
@@ -23,9 +23,10 @@ of interest, so pointing `--crl-folder` at a directory whose contents matter wil
 superseded CRL generally cannot be fetched again, so this can foreclose validating as of a time it
 covered.
 
-**Cleanup moves or deletes, depending on one field.** With an error folder named — and the desktop
-application names one by default — certificates that cannot contribute are moved there. With that
-field cleared, they are deleted. Use *Report Only* first.
+**Cleanup moves or deletes, depending on one field.** `--cleanup` moves certificates that cannot
+contribute to the folder `--error-folder` names; with no error folder they are deleted. Use
+`--report-only` first. The applications do not clean folders — what corresponds there is marking
+rows in the Inspect tables, which writes a new store and leaves the one it read alone.
 
 **A store does not know about certificates added after it was built.** Partial paths are computed
 when the store is generated; adding certificates to a CA folder afterwards does not change an

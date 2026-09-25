@@ -1,19 +1,20 @@
 # Desktop application
 
-The desktop application presents the same options as the command line as a form, organised into
+The desktop application presents the same options as the command line as a form, organized into
 views reached from the sidebar:
 
 > Validate · Results · Settings · Check URIs · Generate · Inspect · Help
 
 The order is the ordinary path through the application — validate something, read the outcome,
 adjust what a run does — followed by the tools for working on trust material rather than validating
-against it. The first four match the browser application, which shares this shell.
+against it. The first four match the browser application, which has a similar look and feel and uses
+a shared code base.
 
 ## Validate
 
 The store selector at the top chooses a complete trust environment on its own. The panels below it
 supplement that store, and they open by themselves whenever they hold anything, so material left
-over from an earlier run is never hidden behind a collapsed heading.
+over from an earlier run is never hidden behind a collapsed heading unless the user chooses to hide it.
 
 The line under the selector says whose PKI the chosen store holds, whether it carries intermediate
 CAs as well as anchors, and how current its material is — up to two dates, *published* and
@@ -21,8 +22,8 @@ CAs as well as anchors, and how current its material is — up to two dates, *pu
 InstallRoot stream is timestamped when it is signed, and the version PITTv3 ships can be
 considerably older than the day it was downloaded. *Collected* is when the material was taken from
 that source, which bounds what it can possibly know: anything the publisher has done since is not
-in these bytes. A store shows only the dates it can state honestly, and the Windows certificate
-stores show none, being read live rather than shipped.
+in these bytes. A store shows only the dates it can state honestly; for example, the Windows certificate
+stores show none, since those are read live from the host system rather than shipped.
 
 **Trust anchors and certification authorities.** One list per kind. Each entry may be a folder, a
 certificate, a bundle holding several, or a `.cbor` store; the run decides which from the path and
@@ -33,24 +34,47 @@ are not filtered apart — an OCSP response has no settled file extension — so
 either kind and each reports what it is actually holding rather than what its label promises. What
 the split buys is being able to clear one kind without disturbing the other.
 
-**End entity certificates.** What the run will judge. The button at the foot counts them, and is
-disabled until there is at least one.
+**End entity certificates.** End entity certificates are the target of validation. The validate button(s) 
+are disabled until there is at least one.
 
-Certificates can also be taken from a TLS server by naming a host: the desktop opens the connection
-itself and keeps the certificates it was presented, including any stapled OCSP response.
+Certificates can also be taken from a TLS server by identifying a host: the desktop opens the connection
+and harvests the certificates it was presented and any stapled OCSP responses.
+
+### A second opinion from Windows
+
+**On Windows only**, a second button beside the ordinary one validates the same certificates with
+the Windows chain engine instead of with `certval`. It is offered here rather than on a view of its
+own because it answers a question about the material already displayed, and it reads the same
+inputs the ordinary run is built from, so no control can feed one validator and not the other.
+
+The checkbox above it, *CAPI uses this run's trust anchors*, decides where trust comes from, and
+the two settings ask genuinely different questions.
+
+**On**, the anchors this run was given — the selected store, and anything added through the
+trust-anchor list — become the engine's only roots. Both validators then judge the same material,
+so a difference in the answer is a difference between the validators rather than between their
+inputs. That is the setting to use when the question is about `certval`.
+
+**Off**, trust comes from this machine's certificate stores, which is the question PITTv2's CAPI
+panel asked: would this computer accept the certificate. 
 
 ## Results
 
-The report, the run log, and four exports: the structured report as JSON, the log as text, every
-path's manifest as one text file, and the certificates and revocation data behind every path as a
-zip. The name field beside them names the archive and the folder inside it; every artifact of one
-run is stamped with the moment that run began, so a pair of saves belongs together by name.
+The Results view displays a variety of information about a validation operation: a status output 
+for each end entity certificate that was considered, a run log, and four export buttons for: the 
+structured report as JSON, the log as text, every path's manifest as one text file, and the 
+certificates and revocation data behind every path as a zip file. The name field beside them 
+is used to name the exported files along with a timestamp that corresponds to when that run began.
+Names and timestamps can be used to correlate the different exported items.
+
+On Windows, a CAPI run appears as a second tab here rather than replacing the first, since using
+the same inputs to two validators is the whole point and comparing the results can be useful. 
 
 *Clear* discards the results and the log, and is disabled when there is nothing to discard.
 
 ## Settings
 
-The tabbed form edits a settings file — the same JSON the command line takes with `-s`. Fields
+The tabbed form edits a settings file. This is the same JSON the command line takes with `-s`. Fields
 marked *default* are not present in the file and use certval's defaults; editing one records an
 override.
 
@@ -100,8 +124,18 @@ a CA; *Clear marks* discards the marks. *Save as a new store* compacts what surv
 the partial paths over the result rather than carrying the old ones across, and asks for a folder to
 write `ta.cbor` and `ca.cbor` into. What was opened is untouched either way.
 
+Because the paths are rediscovered against the anchors that survive, **removing a trust anchor also
+removes every path to it from the saved `ca.cbor`**, even though the certificates stay. That matters
+when the CA store is meant to be paired with other anchor sets: to narrow the anchors while keeping
+a full CA store, use the saved `ta.cbor` with the original `ca.cbor` rather than the edited one. See
+[Partial paths](2_concepts.md#partial-paths).
+
 ## Check URIs
 
 Fetches every HTTP URI one certificate names and reports each on its own, independently of path
 processing. See [Checking the URIs in a certificate](7_miscellaneous.md) for what it does and does
 not tell you.
+
+*Check Self-Signed* says whether the target certificate is self-signed: yes, no, or cannot tell when
+this build has no verifier for its signature algorithm. It is a separate check that needs no
+fetching; the view is simply where a single certificate is already chosen.

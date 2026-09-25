@@ -13,14 +13,15 @@ An issuer — supplied, or auto-discovered from the AIA extension — is what ma
 verification and OCSP possible. Without one, those rows report that they could not be checked rather
 than reporting a failure.
 
-The check is available from the Tools view in the desktop application, from its own view in the
+The check is available from the Check URIs view in the desktop application, from its own view in the
 browser, and as `--check-uris` on the command line. Path validation can also run it over every
 certificate on each path it builds, appending the results to that path's log; each certificate is
 checked once per run.
 
 ## Exporting what a run used
 
-*Export PKI Environment* writes the trust material a validation actually used as a `.cbor` store
+*Save artifacts* on the Results view writes a bundle whose `derived/built-ta.cbor` and
+`derived/built-graph.cbor` are the trust material a validation actually used, as a `.cbor` store
 pair. Two things make that worth doing: it captures an environment assembled by uploading, and it
 captures certificates a run went out and fetched that were not in any store to begin with.
 

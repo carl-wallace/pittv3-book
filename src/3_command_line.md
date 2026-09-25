@@ -1,11 +1,11 @@
 # Command line
 
 `pittv3 --help` lists every option. This chapter covers the shapes of use rather than the options
-one by one, because the options make more sense once the shape is clear.
+one by one, because the options make more sense once the shapes are clear.
 
 ## Validating against a store
 
-The ordinary case. Give it trust anchors, CA certificates and something to validate:
+The ordinary case it to give `pittv3` trust anchors, CA certificates and something to validate:
 
 ```
 pittv3 --ta-folder ./tas --cbor ./pki.cbor --end-entity-file ./cert.der
@@ -21,21 +21,28 @@ from a store with `--cbor`.
 which is what you want when the question is "how many ways does this certificate chain to a given
 trust anchor store" rather than "does it validate".
 
-`--settings` names the JSON file holding path-validation inputs — the initial policy set, the policy
+`--settings` identifies the JSON file holding path-validation inputs: the initial policy set, the policy
 indicators, name constraints, the time of interest. It is the same file the desktop and browser
 applications edit.
 
 ## Generating a store
 
-Discovering partial paths is the expensive step; a store is that work saved:
+Discovering partial paths is the expensive step; a store is that work saved. To generate a trust store,
+give `pittv3` trust anchors and CA certificates alongside the `--generate` flag.
 
 ```
 pittv3 --generate --ta-folder ./tas --ca-folder ./cas --cbor ./pki.cbor
 ```
 
-`--chase-aia-and-sia` extends the search by following the URIs the certificates name, writing what
-it fetches into `--download-folder`. `--cbor-ta-store` writes a trust-anchor store instead, read
-from the CA input.
+`--dynamic-build` extends the search by following the URIs the certificates name, writing what it
+fetches into `--download-folder`. It is the same flag that chases during validation: one name for
+the capability, whichever step is doing it. `--cbor-ta-store` writes a trust-anchor store instead,
+read from the CA input.
+
+`--ta` and `--ca` serve generation as well, and both are repeatable and take an existing `.cbor`
+store, so a store can be built out of the stores you already hold rather than out of loose
+certificates. Only the certificates are taken from one; its partial paths are not, since each
+store's paths describe that store alone and are rediscovered over the union.
 
 ## Building paths dynamically
 
@@ -46,11 +53,12 @@ downloads back in.
 
 ## Revocation
 
-`--crl-folder` names a folder of CRLs that is indexed before validation and also receives CRLs
+`--crl-folder` identifies a folder of CRLs that is indexed before validation and also receives CRLs
 fetched during it. **The folder is written as well as read:** indexing removes any CRL that is not
-valid at the time of interest, so do not point it at a directory whose contents matter.
+valid at the time of interest, so do not point it at a directory that contains archival CRLs you
+wish to keep.
 
-`--rev` supplies CRLs and OCSP responses directly, sorted by content rather than by name.
+`--rev` supplies CRLs and OCSP responses directly, organized by type rather than by file extension.
 `--keep-crl-entries-in-memory` caches verified CRLs for the life of the run;
 `--no-revocation-cache` makes every path obtain its own revocation data, which is slower but leaves
 each path carrying the evidence for its own result — which is what an export needs.
@@ -72,8 +80,8 @@ Nothing here validates anything; each reports what a store holds.
 
 ## Maintaining a folder
 
-`--cleanup` removes certificates a run could not use — unparseable, not valid at the time of
-interest, self-signed, or not a CA — and `--ta-cleanup` does the same for trust anchors. Both
+`--cleanup` removes certificates a run could not use, i.e., unparseable, not valid at the time of
+interest, self-signed, or not a CA, and `--ta-cleanup` does the same for trust anchors. Both
 **move** rather than delete when `--error-folder` is given. `--report-only` says what would go
 without touching anything, and is worth using first.
 

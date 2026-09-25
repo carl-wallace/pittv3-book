@@ -1,7 +1,7 @@
 # Introduction
 
 The PKI Interoperability Test Tool version 3 (PITTv3) is a certification path building and
-validation tool. It builds every path it can find from an end-entity certificate to a trust anchor,
+validation tool. It builds every path it can find from an end-entity certificate to a set of trust anchors,
 validates each one per RFC 5280 as augmented by RFC 5937, and reports what it found and why each
 path succeeded or failed.
 
@@ -18,7 +18,7 @@ rather than in what they conclude:
   certificates do not.
 - **Service API** — bare-bones server-side validation suitable for scripting.
 
-Each of the above uses the same path validation library, `certval`.
+Each of the above uses the `certval` library for path validation and revocation status determination.
 
 ## What this guide covers
 

@@ -25,11 +25,24 @@ The service is the relay plus everything else a deployment needs: it serves the 
 itself, offers trust stores for download, and can validate server-side for a caller that would
 rather send certificates than retrieve artifacts.
 
+### What a request that states nothing means
+
+`POST /api/validate` applies the service's own defaults before anything the caller sent. The one
+that matters is the time of interest: **a request stating no settings validates against now.** The
+library cannot supply it — the service builds certval without `std`, which is a build with no clock
+— and an unstated time is not a wider validity window but no validity check at all.
+
+Settings a caller does send ride *on top of* the defaults rather than replacing them, so stating one
+preference does not withdraw the rest. The report names the time that was used in
+`time_of_interest`, which is the field to read first when a verdict looks wrong.
+
 ### Trust stores
 
 `--stores` names a directory of stores, **read at startup and never written to**. Two layouts are
-accepted: a folder per store holding `ta.cbor` and `ca.cbor`, as *Export PKI Environment* writes
-them, or flat `<id>_ta.cbor` / `<id>_ca.cbor` pairs, as the trust store providers generate them.
+accepted: a folder per store holding `ta.cbor` and `ca.cbor`, or flat `<id>_ta.cbor` /
+`<id>_ca.cbor` pairs, as the trust store providers generate them. A saved artifacts bundle's
+`derived/built-ta.cbor` and `derived/built-graph.cbor`, copied into a folder under those two names,
+serve as a store.
 
 Stores are served from `/stores/{id}/{artifact}` with an entity tag computed over the bytes, so a
 client that already holds a store revalidates with a conditional request rather than downloading it
@@ -56,11 +69,28 @@ A deployment is expected to disable what it does not want, and the defaults are 
 - **Server-side CRL retrieval can be stopped**, leaving revocation to whatever the caller supplied.
 - **Refusing `POST /api/tls`** stops the service completing a handshake with a host named by a
   caller.
+- **`--no-builtin-stores`** offers only what `--stores` names, for a deployment that means to serve
+  a chosen catalog and nothing else.
+
+### Rate limiting
+
+On by default, per client address, in two fixed windows that count **requests, retrievals and
+bytes**. Retrievals are counted apart from requests because the ratio is the client's to choose: a
+single fetch costs one, while a validation that chases costs as many as its budget allows. A
+validation is charged what it actually retrieved rather than what it might have.
+
+The limits live in a `rate_limit` section of the configuration file rather than on the command
+line, a zero meaning unbounded. The effective limits are printed at startup, and turning them off
+prints a warning. A refused request answers 429 with `Retry-After`; the browser application treats
+that as terminal and stops the run rather than meeting the limit once per remaining URI.
+
+The address is the only key, since the service has no sessions — so an office behind one NAT shares
+a budget, which is what the defaults are sized for.
 
 ### Serving the application
 
-`--static` names the directory `trunk build` produced. Cache-Control is chosen per file according to
-whether its name carries a Trunk content hash — `<name>-<16 hex>.js` and the matching `_bg.wasm`
-cannot change without changing their names, so they are safe to pin, while everything else
-revalidates. The test looks for a hash **in the file name only**, so an unhashed asset is never
-pinned by accident.
+`--client-dir` names the directory `trunk build` produced. Cache-Control is chosen per file
+according to whether its name carries a Trunk content hash — `<name>-<16 hex>.js` and the matching
+`_bg.wasm` cannot change without changing their names, so they are safe to pin, while everything
+else revalidates. The test looks for a hash **in the file name only**, so an unhashed asset is
+never pinned by accident.

@@ -11,6 +11,14 @@ declining to answer.
 **FN-DSA is not verified.** The identifiers are declared; verification waits on a FIPS 206
 implementation.
 
+**The browser gathers revocation data before validating rather than while it validates.** certval
+tries sources in a fixed order and stops at the first that answers — a cached determination, a
+no-check extension, stapled data, local CRLs, OCSP from the AIA, then a remote distribution point. A
+page cannot fetch from inside that walk, so the browser works out everything the paths could need,
+retrieves it, and supplies it as local data before validation begins. The consequence is that it may
+retrieve an artifact a command-line run would never have asked for, having been answered earlier in
+the order — which is why a browser run has a retrieval budget and a native one does not.
+
 **This is not a TLS verifier.** Web PKI-specific behavior — name matching rules, policy
 requirements particular to the CA/Browser Forum baseline — is out of scope by design. PITTv3
 validates certification paths per RFC 5280 and RFC 5937; it does not decide whether a certificate is
@@ -33,6 +41,15 @@ when the store is generated; adding certificates to a CA folder afterwards does 
 existing store. Regenerate it.
 
 **A time of interest of `0` disables validity period checks** rather than meaning the epoch.
+
+**Setting a time of interest is almost always wrong** unless you mean to validate relative to a past
+moment — code signing, or replaying an archived run. A past time also discards revocation data
+published since, which is correct and reads as a changed verdict.
+
+**A browser on iOS or iPadOS cannot select a folder.** Safari there does not honor the folder
+mode other browsers offer, so certificates are chosen file by file; a set of several hundred is a
+long selection rather than one pick. Nothing else differs — large sets do validate from an iPad —
+and the desktop application takes folders through the platform's own dialogs.
 
 **Windows machine stores need elevation to read.** The library asks for write access when opening a
 CAPI store, because the wrapper it uses offers no read-only open, so `LocalMachine` fails for an

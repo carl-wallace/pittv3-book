@@ -26,10 +26,11 @@ acceptable for a TLS connection.
 
 ## Things worth knowing
 
-**A CRL folder is written as well as read.** Indexing removes any CRL that does not cover the time
-of interest, so pointing `--crl-folder` at a directory whose contents matter will prune it. A
-superseded CRL generally cannot be fetched again, so this can foreclose validating as of a time it
-covered.
+**A CRL folder is written as well as read.** CRLs fetched during a run, and the last-modified map
+that makes later fetches conditional, are saved into `--crl-folder`. Indexing only skips a CRL that
+does not cover the time of interest, and nothing on the command line removes one. The desktop's
+*Remove stale* button on the CRL index does remove them, and a superseded CRL generally cannot be
+fetched again, so using it forecloses validating as of a time it covered.
 
 **Cleanup moves or deletes, depending on one field.** `--cleanup` moves certificates that cannot
 contribute to the folder `--error-folder` names; with no error folder they are deleted. Use

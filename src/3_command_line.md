@@ -54,9 +54,11 @@ downloads back in.
 ## Revocation
 
 `--crl-folder` identifies a folder of CRLs that is indexed before validation and also receives CRLs
-fetched during it. **The folder is written as well as read:** indexing removes any CRL that is not
-valid at the time of interest, so do not point it at a directory that contains archival CRLs you
-wish to keep.
+fetched during it. Indexing uses only the CRLs that cover the time of interest and leaves the rest on
+disk, so one folder can serve runs at different times; the command line never removes a CRL. **The
+folder is written as well as read**, though: fetched CRLs and the last-modified map that makes later
+fetches conditional are saved into it, so give it a copy rather than a directory of archival CRLs you
+want left as they are.
 
 `--rev` supplies CRLs and OCSP responses directly, organized by type rather than by file extension.
 `--keep-crl-entries-in-memory` caches verified CRLs for the life of the run;
@@ -92,3 +94,14 @@ processing; see [Checking the URIs in a certificate](7_miscellaneous.md).
 `--check-uris-when-validating` runs the same check over every certificate on each path a run builds.
 `--validate-self-signed` answers the narrower question of whether one certificate is self-signed.
 `--mozilla-csv` parses the Mozilla intermediate CA report into a folder of certificates.
+
+## Exit status
+
+PITTv3 exits 0 when the run happened, whatever it found. A target that is `Revoked` or `Invalid`
+still exits 0, and the results say so, so a script cannot tell from the exit status alone whether
+everything validated.
+
+It exits 1, with `error: ...` on standard error, when a run could not start or a request could not
+be answered: no trust anchor source was given, trust anchors or a store would not load, an input file
+could not be read, or an index was out of range. A malformed command line is refused before any of
+that, with exit status 2.

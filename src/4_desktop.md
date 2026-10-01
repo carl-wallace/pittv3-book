@@ -58,6 +58,10 @@ inputs. That is the setting to use when the question is about `certval`.
 **Off**, trust comes from this machine's certificate stores, which is the question PITTv2's CAPI
 panel asked: would this computer accept the certificate. 
 
+**With a time of interest of `0`, the two can disagree about validity periods.** `0` turns off
+validity period checks in `certval`, and the Windows chain engine has no equivalent, so a CAPI run
+validates as of now. The CAPI log notes this under its first line.
+
 ## Results
 
 The Results view displays a variety of information about a validation operation: a status output 

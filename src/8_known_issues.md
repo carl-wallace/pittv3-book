@@ -10,6 +10,12 @@ that CRL was issued, and listed only on a delta, reads as good until the next co
 (PKITS 4.15.4 is that case). With no complete CRL available, status is not determined rather than
 taken from a delta.
 
+**CRLs scoped by onlySomeReasons are not used.** A CRL that covers only some revocation reasons
+cannot show that a certificate is not revoked, since a revocation for another reason is listed
+elsewhere, and coverage is not combined across such CRLs. They are discarded, so a certificate
+whose only CRLs are partitioned by reason gets an undetermined status (PKITS 4.14.18 and 4.14.19
+are that case).
+
 **FN-DSA is not verified.** The identifiers are declared; verification waits on a FIPS 206
 implementation.
 
@@ -54,10 +60,10 @@ mode other browsers offer, so certificates are chosen file by file; a set of sev
 long selection rather than one pick. Nothing else differs — large sets do validate from an iPad —
 and the desktop application takes folders through the platform's own dialogs.
 
-**Windows machine stores need elevation to read.** The library asks for write access when opening a
-CAPI store, because the wrapper it uses offers no read-only open, so `LocalMachine` fails for an
-unelevated process even when only reading. Windows itself does not require that; the constraint is
-ours and is being addressed upstream.
+**Windows machine stores need elevation to read.** The library opens CAPI stores through the
+`schannel` crate, which has no way to open a store read-only, so it asks for write access even when
+it only reads. An unelevated process is refused that access to `LocalMachine`, although Windows
+itself lets any process read the machine stores.
 
 ## Known issues
 

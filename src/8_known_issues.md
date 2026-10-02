@@ -4,9 +4,11 @@
 
 These are choices, not gaps waiting to be filled.
 
-**Delta CRLs are not supported.** They are neither indexed nor considered. A scope requiring one
-fails closed rather than being approximated, because approximating revocation is worse than
-declining to answer.
+**Delta CRLs are not supported.** A delta CRL is never indexed or processed, and a freshestCRL
+pointer is not followed, so status comes from the complete CRL alone. A certificate revoked since
+that CRL was issued, and listed only on a delta, reads as good until the next complete CRL lists it
+(PKITS 4.15.4 is that case). With no complete CRL available, status is not determined rather than
+taken from a delta.
 
 **FN-DSA is not verified.** The identifiers are declared; verification waits on a FIPS 206
 implementation.

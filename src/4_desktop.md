@@ -51,9 +51,15 @@ The checkbox above it, *CAPI uses this run's trust anchors*, decides where trust
 the two settings ask genuinely different questions.
 
 **On**, the anchors this run was given — the selected store, and anything added through the
-trust-anchor list — become the engine's only roots. Both validators then judge the same material,
-so a difference in the answer is a difference between the validators rather than between their
-inputs. That is the setting to use when the question is about `certval`.
+trust-anchor list — become the engine's only roots, so both validators judge against the same
+anchors. That is the setting to use when the question is about `certval`. Only the roots are
+replaced, though: Windows still looks for intermediates in this machine's CA store and its cache,
+so a path CAPI reports can include an intermediate the run never supplied. The chains in the CAPI
+results list every certificate the engine used, so check there before reading a difference as one
+between the validators.
+
+**In either setting, CAPI follows AIA only when *dynamic build* is on**, as `certval` does, and the
+CAPI results say which.
 
 **Off**, trust comes from this machine's certificate stores, which is the question PITTv2's CAPI
 panel asked: would this computer accept the certificate. 

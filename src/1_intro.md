@@ -25,3 +25,5 @@ Each of the above uses the `certval` library for path validation and revocation 
 The [Concepts](2_concepts.md) chapter explains trust stores and partial paths, which are worth
 understanding before any of the interfaces make much sense. The chapters after it cover each
 interface in turn.
+
+This guide is also available as a [PDF](pittv3-book.pdf).

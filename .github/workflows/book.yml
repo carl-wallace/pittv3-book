@@ -1,0 +1,46 @@
+name: Book
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  # Manual re-runs via `gh workflow run book.yml` (available once this file is on the default
+  # branch).
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # Pinned to the version used locally, so CI renders what the author previewed.
+  MDBOOK_VERSION: v0.5.3
+  LYCHEE_VERSION: lychee-v0.24.2
+
+jobs:
+  # Builds the HTML and checks every link and #fragment in it, offline. The book links only to
+  # itself, so offline costs nothing and a slow outside site cannot fail a PR. mdbook-pdf is not
+  # installed, and book.toml marks the PDF backend optional, so only the HTML is built.
+  #
+  # `mdbook test` is not run: it compiles every code block without a language tag as Rust, and
+  # the book's untagged blocks are pittv3 command lines, not Rust.
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install mdBook and lychee
+        run: |
+          mkdir -p "$HOME/bin"
+          curl -sSfL "https://github.com/rust-lang/mdBook/releases/download/$MDBOOK_VERSION/mdbook-$MDBOOK_VERSION-x86_64-unknown-linux-gnu.tar.gz" \
+            | tar xz -C "$HOME/bin"
+          curl -sSfL "https://github.com/lycheeverse/lychee/releases/download/$LYCHEE_VERSION/lychee-x86_64-unknown-linux-gnu.tar.gz" \
+            | tar xz -C "$HOME/bin" --strip-components=1 lychee-x86_64-unknown-linux-gnu/lychee
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+
+      - run: mdbook build
+
+      # 404.html is excluded: it carries a root-relative base href that only means something
+      # once the book is served. The link to pittv3-book.pdf is excluded because CI builds no
+      # PDF to link to.
+      - run: lychee --offline --include-fragments --no-progress --exclude-path 'book/html/404\.html' --exclude 'pittv3-book\.pdf$' book/html

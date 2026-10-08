@@ -11,4 +11,15 @@ git-repository-url = "https://github.com/carl-wallace/pittv3-book"
 # Declaring a second backend makes mdBook nest its output per backend, so the HTML lands in
 # book/html rather than book, and the PDF in book/pdf/output.pdf. Anything that publishes the
 # built book has to point at book/html for that reason.
+#
+# Optional so that a machine without mdbook-pdf, which drives headless Chrome, still builds the
+# HTML: mdBook warns and skips the PDF there. CI is such a machine.
 [output.pdf]
+optional = true
+
+# Puts the PDF in the deployed HTML folder as pittv3-book.pdf, which the introduction links to.
+# mdBook runs backends in name order, so this runs after html and pdf. Where no PDF was built, as
+# in CI, it does nothing.
+[output.pdf-copy]
+command = "sh -c 'cat >/dev/null; [ ! -f ../pdf/output.pdf ] || cp ../pdf/output.pdf ../html/pittv3-book.pdf'"
+optional = true

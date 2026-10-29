@@ -76,7 +76,6 @@ information has to be.
   "psCheckCrls": { "Bool": true },
   "psCheckOcspFromAia": { "Bool": true },
   "psCheckRevocationStatus": { "Bool": true },
-  "psCrlGracePeriodsAsLastResort": { "Bool": false },
   "psEnforceTrustAnchorConstraints": { "Bool": true },
   "psForbidSelfSignedEE": { "Bool": true },
   "psInitialExplicitPolicyIndicator": { "Bool": true },
@@ -96,7 +95,6 @@ What each line buys:
 | `psInitialPolicyMappingInhibitIndicator` | policy mappings are not followed, so a policy must be asserted rather than mapped into |
 | `psEnforceTrustAnchorConstraints` | RFC 5937 constraints carried by the anchor are applied to the path |
 | `psForbidSelfSignedEE` | a self-signed end entity is rejected rather than validated as its own island |
-| `psCrlGracePeriodsAsLastResort` | a CRL past its next-update is no longer accepted as a last resort |
 | `psRevocationMaxAge` | revocation information older than a day is not used, however it arrived |
 | `psOcspAiaNonceSetting` | a nonce is sent and a response that does not echo it is rejected |
 

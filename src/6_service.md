@@ -72,6 +72,16 @@ A deployment is expected to disable what it does not want, and the defaults are 
 - **`--no-builtin-stores`** offers only what `--stores` names, for a deployment that means to serve
   a chosen catalog and nothing else.
 
+### Signature verification
+
+Server-side validation verifies signatures with certval's software, as the browser does, unless the
+configuration's `crypto` list or `--crypto` names other implementations. The names and the ordering
+are those of the [command line](3_command_line.md#choosing-which-crypto-verifies-signatures). A
+service whose list names an implementation its build does not contain refuses to start, and the
+startup log names the implementations in use and what each reports about FIPS mode. A deployment
+that chooses differently from the browser should expect the two to disagree only where the
+implementations do.
+
 ### Rate limiting
 
 On by default, per client address, in two fixed windows that count **requests, retrievals and

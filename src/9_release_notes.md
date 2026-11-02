@@ -16,6 +16,9 @@ at 0.2.1.
   may be certificates or **RFC 5914** `TrustAnchorInfo` values.
 - **Post-quantum signatures** are validated: ML-DSA (FIPS 204) and SLH-DSA (FIPS 205), alongside
   RSA, ECDSA and Ed25519.
+- Signatures can be verified by the platform's cryptographic module (Security.framework on macOS,
+  CNG on Windows), AWS-LC or OpenSSL instead of, or ahead of, certval's software: `--crypto` on the
+  command line and the service, the *Signature verification* settings tab on the desktop.
 - Revocation from CRLs and OCSP: an indexed folder, an in-memory cache, artifacts supplied by the
   caller, and responders reached over the network.
 - Trust stores as a portable CBOR pair carrying certificates together with their precomputed

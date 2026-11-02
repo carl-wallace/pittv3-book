@@ -65,6 +65,26 @@ want left as they are.
 `--no-revocation-cache` makes every path obtain its own revocation data, which is slower but leaves
 each path carrying the evidence for its own result — which is what an export needs.
 
+## Choosing which crypto verifies signatures
+
+Signatures are verified by certval's own RustCrypto-based software implementation unless `--crypto`
+identifies other implementations:
+
+```
+pittv3 --crypto security-framework,software --ta-folder ./tas --end-entity-file ./cert.der
+```
+
+The possible names are `security-framework` (macOS), `cng` (Windows), `aws-lc`, `openssl` (Linux and
+macOS, in a build with the `openssl` feature) and `software`. A build accepts only the
+implementations it contains, and `pittv3 --help` lists them. Each implementation listed is checked
+in turn until one reaches a verdict, and **only those named are checked**. An implementation that
+declines a signature, such as one using an algorithm it does not support, passes it to the next.
+List `software` last to have certval verify whatever the others decline; leave it out and a
+signature none of them answers fails.
+
+When `--crypto` is given, the log names the implementations in use and what each reports about FIPS
+mode.
+
 ## Interrogating a store
 
 Nothing here validates anything; each reports what a store holds.

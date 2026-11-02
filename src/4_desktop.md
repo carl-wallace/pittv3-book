@@ -95,6 +95,13 @@ choosing another, returning to the default, or deleting it.
 The *Folders & files* tab also carries the folders a run writes to and the actions that maintain
 them — cleaning up downloaded certificates, emptying the CRL index, discarding cached graphs.
 
+The *Signature verification* tab chooses which implementations verify signatures, as `--crypto` does
+on the [command line](3_command_line.md#choosing-which-crypto-verifies-signatures). It has one
+checkbox per implementation the build contains, each labeled with what it reports about FIPS mode.
+Selected implementations are checked in the order shown until one reaches a verdict, with certval
+software last. The last box checked cannot be unchecked, so a run always has a verifier. Like the
+folders, the choice is saved with the application's other choices, not in the settings file.
+
 ## Generate
 
 Builds a trust store out of the material you give it. The *Inputs* group is two pools, trust anchors

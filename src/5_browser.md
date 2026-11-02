@@ -2,7 +2,8 @@
 
 The browser application is a WebAssembly build of the same validation library the other interfaces
 use. **Path validation always runs in the browser.** What changes is whether anything is fetched to
-feed it.
+feed it. Signatures are verified by certval's software: none of the implementations the other
+interfaces can choose with `--crypto` builds for WebAssembly.
 
 ## Retrieval
 
